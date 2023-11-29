@@ -1,11 +1,13 @@
 package JWTDockerTutorial.security.config;
 
 import JWTDockerTutorial.security.services.auth.JwtService;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 
@@ -36,27 +39,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        jwtToken = authHeader.substring(7); // after the "Bearer " prefix
-        System.out.println("This is the jwtToken in the auth filter class : " + jwtToken);
-        username = jwtService.extractUsername(jwtToken);
-        System.out.println("This is the username in the auth filter class: " + username);
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            System.out.println("The user is not logged in (auth filter class if clause)");
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            System.out.println("These are the user details (in the auth filter): " + userDetails);
-            if (jwtService.isTokenValid(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-                System.out.println("This is the token that has been generated (auth filter): " + authToken);
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        try {
+            jwtToken = authHeader.substring(7); // after the "Bearer " prefix
+            System.out.println("This is the jwtToken in the auth filter class : " + jwtToken);
+            username = jwtService.extractUsername(jwtToken);
+            System.out.println("This is the username in the auth filter class: " + username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                System.out.println("The user is not logged in (auth filter class if clause)");
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+                System.out.println("These are the user details (in the auth filter): " + userDetails);
+                if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    System.out.println("This is the token that has been generated (auth filter): " + authToken);
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+            filterChain.doFilter(request, response);
+        } catch (SignatureException e) {
+            System.out.println("The has been an error");
+            System.out.println(e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getOutputStream().print("{ \"Message\": \"Unauthorized\" }");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
-        filterChain.doFilter(request, response);
     }
 }
