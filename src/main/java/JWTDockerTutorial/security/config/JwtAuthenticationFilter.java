@@ -1,5 +1,6 @@
 package JWTDockerTutorial.security.config;
 
+import JWTDockerTutorial.security.services.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

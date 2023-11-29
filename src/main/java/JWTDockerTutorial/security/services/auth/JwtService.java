@@ -1,4 +1,4 @@
-package JWTDockerTutorial.security.config;
+package JWTDockerTutorial.security.services.auth;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
