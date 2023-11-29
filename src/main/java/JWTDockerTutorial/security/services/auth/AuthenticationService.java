@@ -1,9 +1,12 @@
-package JWTDockerTutorial.security.auth;
+package JWTDockerTutorial.security.services.auth;
 
+import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
+import JWTDockerTutorial.security.models.auth.AuthenticationResponse;
+import JWTDockerTutorial.security.models.auth.RegisterRequest;
 import JWTDockerTutorial.security.config.JwtService;
-import JWTDockerTutorial.security.user.Role;
-import JWTDockerTutorial.security.user.User;
-import JWTDockerTutorial.security.user.UserRepository;
+import JWTDockerTutorial.security.models.user.Role;
+import JWTDockerTutorial.security.models.user.User;
+import JWTDockerTutorial.security.repositories.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

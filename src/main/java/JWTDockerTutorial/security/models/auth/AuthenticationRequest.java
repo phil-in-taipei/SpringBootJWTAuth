@@ -1,4 +1,4 @@
-package JWTDockerTutorial.security.auth;
+package JWTDockerTutorial.security.models.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

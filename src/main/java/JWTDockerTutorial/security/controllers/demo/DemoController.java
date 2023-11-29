@@ -1,4 +1,4 @@
-package JWTDockerTutorial.security.demo;
+package JWTDockerTutorial.security.controllers.demo;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

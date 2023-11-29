@@ -1,4 +1,4 @@
-package JWTDockerTutorial.security.user;
+package JWTDockerTutorial.security.models.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

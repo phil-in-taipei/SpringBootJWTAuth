@@ -1,5 +1,9 @@
-package JWTDockerTutorial.security.auth;
+package JWTDockerTutorial.security.controllers.auth;
 
+import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
+import JWTDockerTutorial.security.models.auth.AuthenticationResponse;
+import JWTDockerTutorial.security.services.auth.AuthenticationService;
+import JWTDockerTutorial.security.models.auth.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
