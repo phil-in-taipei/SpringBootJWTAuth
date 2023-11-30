@@ -1,6 +1,9 @@
 package JWTDockerTutorial.security.config;
 
 import JWTDockerTutorial.security.services.auth.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -62,11 +65,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (SignatureException e) {
-            System.out.println("The has been an error");
+        } catch (SignatureException  | MalformedJwtException | UnsupportedJwtException e) {
+            System.out.println("There has been an error");
             System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"Message\": \"Unauthorized\" }");
+            response.getOutputStream().print("{ \"Message\": \"Authorization error\" }");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        }  catch (ExpiredJwtException e) {
+            System.out.println("There has been an error");
+            System.out.println(e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getOutputStream().print("{ \"Message\": \"Session Expired. Please login again\" }");
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        }  catch (IllegalArgumentException e) {
+            System.out.println("There has been an error");
+            System.out.println(e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getOutputStream().print("{ \"Message\": \"User is unauthorized!\" }");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
     }
