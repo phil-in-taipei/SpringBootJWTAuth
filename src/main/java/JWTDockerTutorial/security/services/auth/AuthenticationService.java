@@ -71,9 +71,12 @@ public class AuthenticationService {
         String[] doubleUsername = username.split("_");
         System.out.println(doubleUsername.length);
         System.out.println(doubleUsername[0]);
+        var user = userRepository.findByUsername(doubleUsername[0])
+                .orElseThrow();
+        var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .refresh(jwtRefreshToken)
-                .token("This will eventually be a token")
+                .token(jwtToken)
                 .build();
     }
 }
