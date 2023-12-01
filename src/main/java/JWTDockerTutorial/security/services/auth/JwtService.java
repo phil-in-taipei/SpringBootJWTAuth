@@ -42,10 +42,35 @@ public class JwtService {
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis())) // this expiration is just over 10 minutes
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 10))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+
+        return generateRefreshToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateRefreshToken(
+            Map<String, Object> extraClaims,
+            UserDetails userDetails
+    ) {
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername() + "_" +userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis())) // this expiration is just over 24 hrs
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean isRefreshTokenValid(String jwtRefreshToken, UserDetails userDetails) {
+        final String username = extractUsername(jwtRefreshToken);
+        return (username.equals(userDetails.getUsername() + "_" +userDetails.getUsername()))
+                && !isTokenExpired(jwtRefreshToken);
     }
 
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
