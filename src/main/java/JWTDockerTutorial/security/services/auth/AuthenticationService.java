@@ -26,7 +26,8 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
 
 
-    // TODO: 12/1/23 Change this to just a message and have user login to continue
+    // TODO: 12/1/2023 Change this to just a message and have user login to continue
+    // TODO: 2/14/2024 implement separate method/endpoint for admin registration
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
                 .givenName(request.getGivenName())
@@ -62,6 +63,8 @@ public class AuthenticationService {
                 .build();
     }
 
+    // TODO: 2/14/2024 error handling for expired refresh token with isRefreshTokenValid method
+    // TODO: 2/14/2024 don't use underscore to divide doubled username for refresh
     public AuthenticationResponse authenticateRefreshToken(TokenRefreshRequest request) {
         System.out.println(request);
         var jwtRefreshToken = request.getRefresh();

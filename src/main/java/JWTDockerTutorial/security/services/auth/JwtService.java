@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    // generate and store as environment variable
+    // TODO for all app applications: generate new one and store as environment variable
     private static final String SECRET_KEY = "050b872ced72e5c140063eefc0cb17b7050b872ced72e5c140063eefc0cb17b7";
 
     public String extractUsername(String jwtToken) {
@@ -34,6 +34,7 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
+    // TODO: 2/14/2024 double check expiration time
     public String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
@@ -53,6 +54,8 @@ public class JwtService {
         return generateRefreshToken(new HashMap<>(), userDetails);
     }
 
+    // TODO: 2/14/2024 don't use underscore to divide doubled username for refresh
+    // TODO: 2/14/2024 double check expiration time
     public String generateRefreshToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
@@ -67,6 +70,7 @@ public class JwtService {
                 .compact();
     }
 
+    // TODO: 2/14/2024 -- use method below for error handling in AuthenticationController refresh endpoint
     public boolean isRefreshTokenValid(String jwtRefreshToken, UserDetails userDetails) {
         final String username = extractUsername(jwtRefreshToken);
         return (username.equals(userDetails.getUsername() + "_" +userDetails.getUsername()))
