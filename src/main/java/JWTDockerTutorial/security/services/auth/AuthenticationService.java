@@ -28,23 +28,7 @@ public class AuthenticationService {
 
     // TODO: 12/1/2023 Change this to just a message and have user login to continue
     // TODO: 2/14/2024 implement separate method/endpoint for admin registration
-    public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
-                .givenName(request.getGivenName())
-                .surname(request.getSurname())
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
-                .build();
-        userRepository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        var jwtRefreshToken = jwtService.generateRefreshToken(user);
-        return AuthenticationResponse.builder()
-                .refresh(jwtRefreshToken)
-                .token(jwtToken)
-                .build();
-    }
+
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(

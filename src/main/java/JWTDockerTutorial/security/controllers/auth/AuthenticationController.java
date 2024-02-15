@@ -2,6 +2,7 @@ package JWTDockerTutorial.security.controllers.auth;
 
 import JWTDockerTutorial.security.models.auth.*;
 import JWTDockerTutorial.security.services.auth.AuthenticationService;
+import JWTDockerTutorial.security.services.registration.UserRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,8 @@ public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;
-   // private final AuthenticationService service;
+    //@Autowired
+    //UserRegistrationService userRegistrationService;
 
 
     @PostMapping("/refresh")
@@ -30,12 +32,12 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.authenticateRefreshToken(request));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.register(request));
-    }
+    //@PostMapping("/register")
+    //public ResponseEntity<RegistrationResponse> register(
+    //        @RequestBody RegisterRequest request
+    //) {
+    //    return ResponseEntity.ok(userRegistrationService.register(request));
+    //}
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> register(
