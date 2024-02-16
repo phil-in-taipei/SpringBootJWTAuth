@@ -1,7 +1,8 @@
 package JWTDockerTutorial.security.controllers.registration;
 
-import JWTDockerTutorial.security.exceptions.PasswordConfirmationFailureException;
-import JWTDockerTutorial.security.models.auth.RegisterRequest;
+import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
+import JWTDockerTutorial.security.models.registration.RegisterRequest;
+import JWTDockerTutorial.security.models.errors.ApiError;
 import JWTDockerTutorial.security.services.registration.UserRegistrationService;
 
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/register")
@@ -30,11 +29,15 @@ public class UserRegistrationController {
         try {
             return ResponseEntity.ok(userRegistrationService.register(request));
         } catch (PasswordConfirmationFailureException  e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body("There was an error. Please try again");
+            return ResponseEntity.badRequest().body(
+                    new ApiError("There was an error. Please try again")
+            );
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body("A user with that username already exists. Please try again");
+            return ResponseEntity.badRequest().body(
+                    new ApiError("A user with that username already exists. Please try again")
+            );
         }
     }
 
@@ -44,13 +47,16 @@ public class UserRegistrationController {
     ) {
         try {
             return ResponseEntity.ok(userRegistrationService.registerAdmin(request));
-
         } catch (PasswordConfirmationFailureException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalStateException e) {
-            return ResponseEntity.badRequest().body("There was an error. Please try again");
+            return ResponseEntity.badRequest().body(
+                    new ApiError("There was an error. Please try again")
+            );
         } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.badRequest().body("A user with that username already exists. Please try again");
+            return ResponseEntity.badRequest().body(
+                    new ApiError("A user with that username already exists. Please try again")
+            );
         }
     }
 }

@@ -66,28 +66,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
-                    System.out.println("This is the token that has been generated (auth filter): " + authToken);
+                    //System.out.println("This is the token that has been generated (auth filter): " + authToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
             filterChain.doFilter(request, response);
         } catch (SignatureException  | MalformedJwtException | UnsupportedJwtException e) {
-            System.out.println("There has been an error");
-            System.out.println(e.getMessage());
+            //System.out.println("There has been an error");
+            //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"Message\": \"Authorization error\" }");
+            response.getOutputStream().print("{ \"message\": \"Authorization error\" }");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }  catch (ExpiredJwtException e) {
-            System.out.println("There has been an error");
-            System.out.println(e.getMessage());
+            //System.out.println("There has been an error");
+            //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"Message\": \"Session Expired. Please login again\" }");
+            response.getOutputStream().print("{ \"message\": \"Session Expired. Please login again\" }");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }  catch (IllegalArgumentException e) {
-            System.out.println("There has been an error");
-            System.out.println(e.getMessage());
+            //System.out.println("There has been an error");
+            //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"Message\": \"User is unauthorized!\" }");
+            response.getOutputStream().print("{ \"message\": \"User is unauthorized!\" }");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
     }

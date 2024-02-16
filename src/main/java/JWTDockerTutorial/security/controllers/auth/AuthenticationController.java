@@ -1,8 +1,9 @@
 package JWTDockerTutorial.security.controllers.auth;
 
+import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
+import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.*;
 import JWTDockerTutorial.security.services.auth.AuthenticationService;
-import JWTDockerTutorial.security.services.registration.UserRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import JWTDockerTutorial.security.models.auth.AuthenticationResponse;
+import JWTDockerTutorial.security.models.errors.ApiError;
 
 
 @RestController
@@ -20,30 +21,35 @@ public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;
-    //@Autowired
-    //UserRegistrationService userRegistrationService;
-
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthenticationResponse> refreshNewToken(
+    public ResponseEntity<Object> refreshNewToken(
             @RequestBody TokenRefreshRequest request
     ) {
-        System.out.println("This is the request data");
-        return ResponseEntity.ok(authenticationService.authenticateRefreshToken(request));
+        try {
+            return ResponseEntity.ok(authenticationService.authenticateRefreshToken(request));
+        } catch (UserNotFoundException | RefreshTokenExpiredException e) {
+            return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiError("There was an error. Please try again")
+            );
+        }
     }
 
-    //@PostMapping("/register")
-    //public ResponseEntity<RegistrationResponse> register(
-    //        @RequestBody RegisterRequest request
-    //) {
-    //    return ResponseEntity.ok(userRegistrationService.register(request));
-    //}
-
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<Object> register(
             @RequestBody AuthenticationRequest request
     ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+        try {
+            return ResponseEntity.ok(authenticationService.authenticate(request));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(
+                    new ApiError("There was an error. Please try again")
+            );
+        }
     }
 
 }

@@ -63,7 +63,7 @@ public class JwtService {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername() + "_" +userDetails.getUsername())
+                .setSubject(userDetails.getUsername() + userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis())) // this expiration is just over 24 hrs
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -73,17 +73,17 @@ public class JwtService {
     // TODO: 2/14/2024 -- use method below for error handling in AuthenticationController refresh endpoint
     public boolean isRefreshTokenValid(String jwtRefreshToken, UserDetails userDetails) {
         final String username = extractUsername(jwtRefreshToken);
-        return (username.equals(userDetails.getUsername() + "_" +userDetails.getUsername()))
-                && !isTokenExpired(jwtRefreshToken);
+        return (username.equals(userDetails.getUsername() + userDetails.getUsername()))
+                && isTokenExpired(jwtRefreshToken);
     }
 
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
         final String username = extractUsername(jwtToken);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(jwtToken);
+        return (username.equals(userDetails.getUsername())) && isTokenExpired(jwtToken);
     }
 
     private boolean isTokenExpired(String jwtToken) {
-        return extractExpiration(jwtToken).before(new Date());
+        return !extractExpiration(jwtToken).before(new Date());
     }
 
     private Date extractExpiration(String jwtToken) {

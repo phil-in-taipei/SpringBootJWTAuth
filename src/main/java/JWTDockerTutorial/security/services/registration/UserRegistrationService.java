@@ -1,8 +1,8 @@
 package JWTDockerTutorial.security.services.registration;
 
-import JWTDockerTutorial.security.exceptions.PasswordConfirmationFailureException;
-import JWTDockerTutorial.security.models.auth.RegisterRequest;
-import JWTDockerTutorial.security.models.auth.RegistrationResponse;
+import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
+import JWTDockerTutorial.security.models.registration.RegisterRequest;
+import JWTDockerTutorial.security.models.registration.RegistrationResponse;
 import JWTDockerTutorial.security.models.user.Role;
 import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
