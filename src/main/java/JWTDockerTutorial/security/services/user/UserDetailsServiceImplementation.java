@@ -1,5 +1,7 @@
 package JWTDockerTutorial.security.services.user;
 
+import JWTDockerTutorial.security.logging.BatchLogger;
+import JWTDockerTutorial.security.logging.Loggable;
 import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     UserRepository repository;
 
     //@Loggable
+    @BatchLogger
     @Override
     public User loadUserByUsername(String username)
             throws UsernameNotFoundException {

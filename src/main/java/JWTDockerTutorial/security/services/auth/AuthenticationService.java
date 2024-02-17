@@ -2,6 +2,7 @@ package JWTDockerTutorial.security.services.auth;
 
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
+import JWTDockerTutorial.security.logging.BatchLogger;
 import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
 import JWTDockerTutorial.security.models.auth.AuthenticationResponse;
 import JWTDockerTutorial.security.models.auth.TokenRefreshRequest;
@@ -24,8 +25,10 @@ public class AuthenticationService {
     @Autowired
     UserRepository userRepository;
 
-
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws UserNotFoundException {
+    @BatchLogger
+    public AuthenticationResponse authenticate(
+            AuthenticationRequest request
+    ) throws UserNotFoundException {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -42,6 +45,7 @@ public class AuthenticationService {
                 .build();
     }
 
+    @BatchLogger
     public AuthenticationResponse authenticateRefreshToken(
             TokenRefreshRequest request
     ) throws UserNotFoundException, RefreshTokenExpiredException {

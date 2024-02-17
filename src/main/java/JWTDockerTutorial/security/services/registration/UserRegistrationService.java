@@ -1,6 +1,8 @@
 package JWTDockerTutorial.security.services.registration;
 
 import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
+import JWTDockerTutorial.security.logging.BatchLogger;
+import JWTDockerTutorial.security.logging.Loggable;
 import JWTDockerTutorial.security.models.registration.RegisterRequest;
 import JWTDockerTutorial.security.models.registration.RegistrationResponse;
 import JWTDockerTutorial.security.models.user.Role;
@@ -21,9 +23,14 @@ public class UserRegistrationService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public RegistrationResponse register(RegisterRequest request) throws PasswordConfirmationFailureException {
+    @BatchLogger
+    public RegistrationResponse register(
+            RegisterRequest request
+    ) throws PasswordConfirmationFailureException {
         if (!Objects.equals(request.getPasswordConfirmation(), request.getPassword())) {
-            throw new PasswordConfirmationFailureException("The passwords do not match. Please try again.");
+            throw new PasswordConfirmationFailureException(
+                    "The passwords do not match. Please try again."
+            );
         }
         var user = User.builder()
                 .givenName(request.getGivenName())
@@ -35,13 +42,21 @@ public class UserRegistrationService {
                 .build();
         userRepository.save(user);
         return RegistrationResponse.builder()
-                .message("Account successfully created for user: " + user.getUsername())
+                .message(
+                        "Account successfully created for user: " +
+                                user.getUsername()
+                )
                 .build();
     }
 
-    public RegistrationResponse registerAdmin(RegisterRequest request) throws PasswordConfirmationFailureException {
+    @BatchLogger
+    public RegistrationResponse registerAdmin(
+            RegisterRequest request
+    ) throws PasswordConfirmationFailureException {
         if (!Objects.equals(request.getPasswordConfirmation(), request.getPassword())) {
-            throw new PasswordConfirmationFailureException("The passwords do not match. Please try again.");
+            throw new PasswordConfirmationFailureException(
+                    "The passwords do not match. Please try again."
+            );
         }
         var user = User.builder()
                 .givenName(request.getGivenName())
