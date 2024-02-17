@@ -13,14 +13,14 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImplementation implements UserDetailsService {
 
     @Autowired
-    UserRepository repository;
+    UserRepository userRepository;
 
     //@Loggable
     @BatchLogger
     @Override
     public User loadUserByUsername(String username)
             throws UsernameNotFoundException {
-        return repository.findByUsername(username).orElseThrow(() ->
+        return userRepository.findByUsername(username).orElseThrow(() ->
                 new UsernameNotFoundException(
                         "User not found with username: "
                                 + username)
