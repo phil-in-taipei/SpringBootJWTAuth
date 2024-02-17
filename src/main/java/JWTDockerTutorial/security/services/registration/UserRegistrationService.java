@@ -2,7 +2,7 @@ package JWTDockerTutorial.security.services.registration;
 
 import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
 import JWTDockerTutorial.security.logging.BatchLogger;
-import JWTDockerTutorial.security.logging.Loggable;
+//import JWTDockerTutorial.security.logging.Loggable;
 import JWTDockerTutorial.security.models.registration.RegisterRequest;
 import JWTDockerTutorial.security.models.registration.RegistrationResponse;
 import JWTDockerTutorial.security.models.user.Role;
