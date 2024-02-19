@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -136,12 +137,37 @@ class UserRegistrationControllerTest {
     }
 
     @Test
+    void registerUserPasswordConfirmationFailure() throws Exception {
+        when(userRegistrationService.register(any(RegisterRequest.class)))
+                .thenThrow(new PasswordConfirmationFailureException(
+                        "The passwords do not match. Please try again.")
+                );
+        mockMvc.perform(post("/api/register/user")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(
+                                testUserRegistrationRequestPasswordError)
+                        )
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                "The passwords do not match. Please try again.")
+                );
+
+    }
+
+    @Test
     void registerAdmin() throws Exception {
         when(userRegistrationService.registerAdmin(testAdminRegistrationRequest))
                 .thenReturn(testAdminRegistrationResponse);
         mockMvc.perform(post("/api/register/admin")
                         .contentType("application/json")
-                        .content(TestUtil.convertObjectToJsonBytes(testAdminRegistrationRequest))
+                        .content(TestUtil.convertObjectToJsonBytes(
+                                testAdminRegistrationRequest)
+                        )
                 )
                 //.andDo(print())
                 .andExpect(status().isCreated())
@@ -151,5 +177,28 @@ class UserRegistrationControllerTest {
                         .value(
                                 "Account successfully created for admin: Test Admin")
                 );
+    }
+
+    @Test
+    void registerAdminPasswordConfirmationFailure() throws Exception {
+        when(userRegistrationService.registerAdmin(any(RegisterRequest.class)))
+                .thenThrow(new PasswordConfirmationFailureException(
+                        "The passwords do not match. Please try again.")
+                );
+        mockMvc.perform(post("/api/register/admin")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(
+                                testAdminRegistrationRequestPasswordError)
+                        )
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message")
+                        .value(
+                               "The passwords do not match. Please try again.")
+                );
+
     }
 }

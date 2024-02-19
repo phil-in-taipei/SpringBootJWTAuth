@@ -49,7 +49,7 @@ public class UserRegistrationController {
         try {
             return new ResponseEntity<>(userRegistrationService.registerAdmin(request), HttpStatus.CREATED);
         } catch (PasswordConfirmationFailureException  e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(
                     new ApiError("There was an error. Please try again")
