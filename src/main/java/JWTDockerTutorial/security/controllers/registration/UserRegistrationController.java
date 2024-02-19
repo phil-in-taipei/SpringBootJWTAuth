@@ -8,6 +8,7 @@ import JWTDockerTutorial.security.services.registration.UserRegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,7 @@ public class UserRegistrationController {
             @RequestBody RegisterRequest request
     ) {
         try {
-            return ResponseEntity.ok(userRegistrationService.register(request));
+            return new ResponseEntity<>(userRegistrationService.register(request), HttpStatus.CREATED);
         } catch (PasswordConfirmationFailureException  e) {
             return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {
@@ -46,7 +47,7 @@ public class UserRegistrationController {
             @RequestBody RegisterRequest request
     ) {
         try {
-            return ResponseEntity.ok(userRegistrationService.registerAdmin(request));
+            return new ResponseEntity<>(userRegistrationService.registerAdmin(request), HttpStatus.CREATED);
         } catch (PasswordConfirmationFailureException  e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (IllegalStateException e) {
