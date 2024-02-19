@@ -41,7 +41,6 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    // TODO: 2/14/2024 double check expiration time
     @BatchLogger
     public String generateToken(
             Map<String, Object> extraClaims,
@@ -52,7 +51,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis())) // this expiration is just over 10 minutes
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 2))
+                .setExpiration(new Date(System.currentTimeMillis() + 600000))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -73,7 +72,7 @@ public class JwtService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername() + userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis())) // this expiration is just over 24 hrs
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
