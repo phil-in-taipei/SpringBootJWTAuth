@@ -71,7 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             filterChain.doFilter(request, response);
-        } catch (SignatureException  | MalformedJwtException | UnsupportedJwtException e) {
+            // TODO: double check that these exceptions all throw properly after refactoring (2/19/2024)
+        } catch (SignatureException  | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
             //System.out.println("There has been an error");
             //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -82,12 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getOutputStream().print("{ \"message\": \"Session Expired. Please login again\" }");
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        }  catch (IllegalArgumentException e) {
-            //System.out.println("There has been an error");
-            //System.out.println(e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"message\": \"User is unauthorized!\" }");
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
     }
