@@ -3,6 +3,7 @@ package JWTDockerTutorial.security.services.auth;
 import JWTDockerTutorial.security.logging.BatchLogger;
 import JWTDockerTutorial.security.logging.Loggable;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -22,6 +23,7 @@ import java.util.function.Function;
 public class JwtService {
 
     // TODO for all app applications: generate new one and store as environment variable
+    // DO NOT put visible key string here in actual apps!!
     private static final String SECRET_KEY = "050b872ced72e5c140063eefc0cb17b7050b872ced72e5c140063eefc0cb17b7";
 
     @BatchLogger
@@ -86,8 +88,11 @@ public class JwtService {
 
     @BatchLogger
     public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        final String username = extractUsername(jwtToken);
-        return (username.equals(userDetails.getUsername())) && isTokenExpired(jwtToken);
+        boolean expired = isTokenExpired(jwtToken);
+        System.out.println("Token is expired");
+        System.out.println(expired);
+        String username = extractUsername(jwtToken);
+        return expired && (username.equals(userDetails.getUsername()));
     }
 
     @BatchLogger
@@ -110,7 +115,7 @@ public class JwtService {
                 .getBody();
     }
 
-    @Loggable
+    @BatchLogger
     private Key getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);

@@ -1,7 +1,6 @@
 package JWTDockerTutorial.security.services.auth;
 
 import JWTDockerTutorial.security.SecurityApplication;
-import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
@@ -12,21 +11,17 @@ import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
 import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes= SecurityApplication.class)
