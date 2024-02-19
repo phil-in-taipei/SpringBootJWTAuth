@@ -54,6 +54,9 @@ public class AuthenticationService {
         //System.out.println("This is the jwtToken in the auth refresh token class : " + jwtRefreshToken);
         var username = jwtService.extractUsername(jwtRefreshToken);
         //System.out.println("This is the username in the auth service class refresh token method: " + username);
+        if (username == null) {
+            throw new UserNotFoundException("The user does not exist");
+        }
         var user = userRepository.findByUsername(username.substring(0, username.length() / 2))
                 .orElseThrow(() -> new UserNotFoundException("The user does not exist"));
         if (!jwtService.isRefreshTokenValid(jwtRefreshToken, user)) {

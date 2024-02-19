@@ -1,6 +1,7 @@
 package JWTDockerTutorial.security.services.auth;
 
 import JWTDockerTutorial.security.SecurityApplication;
+import JWTDockerTutorial.security.exceptions.auth.PasswordConfirmationFailureException;
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
@@ -32,8 +33,8 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles("test")
 class AuthenticationServiceTest {
 
-    //@MockBean
-    //AuthenticationManager authenticationManager;
+    @MockBean
+    AuthenticationManager authenticationManager;
 
     @Autowired
     AuthenticationService authenticationService;
@@ -85,7 +86,6 @@ class AuthenticationServiceTest {
         when(jwtService.generateRefreshToken(testUser))
                 .thenReturn(testRefreshToken);
         AuthenticationResponse testResponse = authenticationService.authenticate(testAuthRequest);
-        System.out.println(testResponse);
         assertThat(testResponse.getToken())
                 .isEqualTo(testAuthResponse.getToken());
         assertThat(testResponse.getRefresh())
@@ -93,7 +93,18 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void authenticateRefreshToken() throws UserNotFoundException, RefreshTokenExpiredException {
+    void authenticateUserNotFoundFailure() {
+        testAuthRequest.setUsername("incorrect");
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> {
+            authenticationService.authenticate(testAuthRequest);
+        });
+    }
+
+    @Test
+    void authenticateRefreshToken() throws
+            UserNotFoundException, RefreshTokenExpiredException {
         when(userRepository.findByUsername(anyString()))
                 .thenReturn(Optional.ofNullable(testUser));
         when(jwtService.isRefreshTokenValid(testRefreshToken, testUser))
@@ -106,10 +117,38 @@ class AuthenticationServiceTest {
                 .authenticateRefreshToken(
                     testRefreshTokenRequest
         );
-        System.out.println(testResponse);
         assertThat(testResponse.getToken())
                 .isEqualTo(testToken2);
         assertThat(testResponse.getRefresh())
                 .isEqualTo(testRefreshToken);
+    }
+
+    @Test
+    void authenticateRefreshTokenExpiredFailure() {
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.ofNullable(testUser));
+        when(jwtService.isRefreshTokenValid(testRefreshToken, testUser))
+                .thenReturn(false);
+        when(jwtService.extractUsername(testRefreshToken))
+                .thenReturn(testUser.getUsername() + testUser.getUsername());
+        assertThrows(RefreshTokenExpiredException.class, () -> {
+            authenticationService
+                    .authenticateRefreshToken(
+                            testRefreshTokenRequest
+                    );
+        });
+    }
+
+    @Test
+    void authenticateRefreshTokenUserNotFoundFailure() {
+        testAuthRequest.setUsername("incorrect");
+        when(userRepository.findByUsername(anyString()))
+                .thenReturn(Optional.empty());
+        assertThrows(UserNotFoundException.class, () -> {
+            authenticationService
+                    .authenticateRefreshToken(
+                            testRefreshTokenRequest
+                    );
+        });
     }
 }
