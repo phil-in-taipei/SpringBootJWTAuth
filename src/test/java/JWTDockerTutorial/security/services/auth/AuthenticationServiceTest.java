@@ -46,16 +46,17 @@ class AuthenticationServiceTest {
     User testUser = User.builder()
             .givenName("Test")
             .surname("User")
-            .username("Test User")
+            .username("TestUser")
             .email("test@gmx.com")
             .password("testpassword")
             .role(Role.USER)
             .build();
 
-    String testToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjYiLCJpYXQiOjE3MDgzMTUwNzQsImV4cCI6MTcwODMxNTY3NH0.PCa9QIA8TDpELTCxjowGbJ5vcwE16o-AqBVW4JWGloQ";
+    String testToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlciIsImlhdCI6MTcwODMzOTkyNSwiZXhwIjoxNzA4MzQwNTI1fQ.KatZsTHYGSrT5_dUX-d1aJ0LG5C1WeTIBQ71-CgisUo";
 
-    String testToken2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjYiLCJpYXQiOjE3MDgzMjU0NjEsImV4cCI6MTcwODMyNjA2MX0.KCM5B-9HATquKVnrauViQC9z_mfDZvzwUasn1cAcYBs";
-    String testRefreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjZUZXN0VXNlcjYiLCJpYXQiOjE3MDgzMTUwNzQsImV4cCI6MTcwODQwMTQ3NH0.3RU0-MLIZeKqw5O2roHyb6B5ylQDaQUp2UoY2HS9TqM";
+    String testToken2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlciIsImlhdCI6MTcwODM0MDEzNywiZXhwIjoxNzA4MzQwNzM3fQ.GS3YaAptM2B9Lbu1ihZuyfJNZmgM_W5FztqLt8ubgQA";
+
+    String testRefreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlclRlc3RVc2VyIiwiaWF0IjoxNzA4MzM5OTI1LCJleHAiOjE3MDg0MjYzMjV9.SoSyPS5PODhjAOzyVYZ4pMFIIQ0eHPObCUk96-TkMMw";
 
     AuthenticationRequest testAuthRequest = new AuthenticationRequest(
             testUser.getUsername(), testUser.getPassword()

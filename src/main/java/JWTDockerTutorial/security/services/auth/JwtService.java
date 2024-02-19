@@ -33,8 +33,9 @@ public class JwtService {
 
     @BatchLogger
     public <T> T extractClaim(String jwtToken, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(jwtToken);
-        System.out.println("These are the claims: " + claims);
+       // System.out.println("****Extracting claim***");
+        Claims claims = extractAllClaims(jwtToken);
+        //System.out.println("These are the claims: " + claims);
         return claimsResolver.apply(claims);
     }
 
@@ -60,7 +61,6 @@ public class JwtService {
 
     @BatchLogger
     public String generateRefreshToken(UserDetails userDetails) {
-
         return generateRefreshToken(new HashMap<>(), userDetails);
     }
 
@@ -80,33 +80,50 @@ public class JwtService {
     }
 
     @BatchLogger
-    public boolean isRefreshTokenValid(String jwtRefreshToken, UserDetails userDetails) {
-        final String username = extractUsername(jwtRefreshToken);
-        return (username.equals(userDetails.getUsername() + userDetails.getUsername()))
-                && isTokenExpired(jwtRefreshToken);
+    public boolean isRefreshTokenValid(
+            String jwtRefreshToken, UserDetails userDetails
+    ) throws ExpiredJwtException {
+        //System.out.println("Calling method to check if refresh token is valid");
+        try {
+            String username = extractUsername(jwtRefreshToken);
+           // System.out.println("This is the name in the refresh token " + username);
+            //System.out.println(userDetails.getUsername() + userDetails.getUsername());
+            return username.equals(userDetails.getUsername() + userDetails.getUsername());
+        } catch (ExpiredJwtException e) {
+            //System.out.println("Refresh token is expired");
+            return false;
+        }
+
     }
 
     @BatchLogger
-    public boolean isTokenValid(String jwtToken, UserDetails userDetails) {
-        boolean expired = isTokenExpired(jwtToken);
-        System.out.println("Token is expired");
-        System.out.println(expired);
-        String username = extractUsername(jwtToken);
-        return expired && (username.equals(userDetails.getUsername()));
+    public boolean isTokenValid(String jwtToken, UserDetails userDetails)
+            throws ExpiredJwtException {
+        try {
+            String username = extractUsername(jwtToken);
+            return username.equals(userDetails.getUsername());
+        } catch (ExpiredJwtException e) {
+            return false;
+        }
     }
 
+    /* note: the workflow below will raise an error when expired -- not return boolean false
     @BatchLogger
     private boolean isTokenExpired(String jwtToken) {
-        return !extractExpiration(jwtToken).before(new Date());
+        System.out.println("Checking if token is expired");
+        return extractExpiration(jwtToken).before(new Date());
     }
 
     @BatchLogger
     private Date extractExpiration(String jwtToken) {
+        System.out.println("Extract exp method calling....");
         return extractClaim(jwtToken, Claims::getExpiration);
     }
+     */
 
     @BatchLogger
     private Claims extractAllClaims(String jwtToken) {
+        System.out.println("Extract all claims");
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getSignInKey())
