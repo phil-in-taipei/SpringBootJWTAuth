@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,6 +161,29 @@ class UserRegistrationControllerTest {
     }
 
     @Test
+    void registerUserDataIntegrityFailure() throws Exception {
+        when(userRegistrationService.register(any(RegisterRequest.class)))
+                .thenThrow(new DataIntegrityViolationException(
+                        "A user with that username already exists. Please try again")
+                );
+        mockMvc.perform(post("/api/register/user")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(
+                                testUserRegistrationRequest)
+                        )
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                "A user with that username already exists. Please try again")
+                );
+
+    }
+
+    @Test
     void registerAdmin() throws Exception {
         when(userRegistrationService.registerAdmin(testAdminRegistrationRequest))
                 .thenReturn(testAdminRegistrationResponse);
@@ -177,6 +201,29 @@ class UserRegistrationControllerTest {
                         .value(
                                 "Account successfully created for admin: Test Admin")
                 );
+    }
+
+    @Test
+    void registerAdminDataIntegrityFailure() throws Exception {
+        when(userRegistrationService.registerAdmin(any(RegisterRequest.class)))
+                .thenThrow(new DataIntegrityViolationException(
+                        "A user with that username already exists. Please try again")
+                );
+        mockMvc.perform(post("/api/register/admin")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(
+                                testAdminRegistrationRequest)
+                        )
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.message")
+                        .value(
+                                "A user with that username already exists. Please try again")
+                );
+
     }
 
     @Test
