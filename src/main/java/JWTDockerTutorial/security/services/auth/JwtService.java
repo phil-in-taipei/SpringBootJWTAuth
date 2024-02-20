@@ -78,23 +78,25 @@ public class JwtService {
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
+    /* Note: this is redundant because the logic is already handled in the AuthenticationService
     @BatchLogger
     public boolean isRefreshTokenValid(
             String jwtRefreshToken, UserDetails userDetails
     ) throws ExpiredJwtException {
-        //System.out.println("Calling method to check if refresh token is valid");
+        System.out.println("*******Calling method to check if refresh token matches user*******");
         try {
             String username = extractUsername(jwtRefreshToken);
            // System.out.println("This is the name in the refresh token " + username);
             //System.out.println(userDetails.getUsername() + userDetails.getUsername());
             return username.equals(userDetails.getUsername() + userDetails.getUsername());
         } catch (ExpiredJwtException e) {
-            //System.out.println("Refresh token is expired");
+            System.out.println("Refresh token is expired");
             return false;
         }
 
     }
+
+     */
 
     @BatchLogger
     public boolean isTokenValid(String jwtToken, UserDetails userDetails)

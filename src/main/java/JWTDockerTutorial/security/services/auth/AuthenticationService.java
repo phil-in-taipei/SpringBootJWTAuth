@@ -7,6 +7,8 @@ import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
 import JWTDockerTutorial.security.models.auth.AuthenticationResponse;
 import JWTDockerTutorial.security.models.auth.TokenRefreshRequest;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
+import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,20 +25,24 @@ public class AuthenticationService {
     JwtService jwtService;
 
     @Autowired
-    UserRepository userRepository;
+    UserDetailsServiceImplementation userService;
 
     @BatchLogger
     public AuthenticationResponse authenticate(
             AuthenticationRequest request
     ) throws UserNotFoundException {
+        System.out.println(".......Running auth manager....");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 )
         );
-        var user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("The user does not exist"));
+        System.out.println(".......Getting user....");
+        var user = userService.loadUserByUsername(request.getUsername());
+        if (user == null) {
+            throw new UserNotFoundException("The user does not exist!");
+        }
         var jwtToken = jwtService.generateToken(user);
         var jwtRefreshToken = jwtService.generateRefreshToken(user);
         return AuthenticationResponse.builder()
@@ -48,25 +54,21 @@ public class AuthenticationService {
     @BatchLogger
     public AuthenticationResponse authenticateRefreshToken(
             TokenRefreshRequest request
-    ) throws UserNotFoundException, RefreshTokenExpiredException {
-        //System.out.println(request);
+    ) throws UserNotFoundException, RefreshTokenExpiredException, ExpiredJwtException {
+        System.out.println(request);
         var jwtRefreshToken = request.getRefresh();
-        //System.out.println("This is the jwtToken in the auth refresh token class : " + jwtRefreshToken);
-        var username = jwtService.extractUsername(jwtRefreshToken);
-        //System.out.println("This is the username in the auth service class refresh token method: " + username);
-        if (username == null) {
-            throw new UserNotFoundException("The user does not exist");
-        }
-        var user = userRepository.findByUsername(username.substring(0, username.length() / 2))
-                .orElseThrow(() -> new UserNotFoundException("The user does not exist"));
-        if (!jwtService.isRefreshTokenValid(jwtRefreshToken, user)) {
+        System.out.println("This is the jwtToken in the auth refresh token class : " + jwtRefreshToken);
+        try {
+            var username = jwtService.extractUsername(jwtRefreshToken);
+            var user = userService.loadUserByUsername(username.substring(0, username.length() / 2));
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .refresh(jwtRefreshToken)
+                    .token(jwtToken)
+                    .build();
+        } catch (ExpiredJwtException e) {
             throw new RefreshTokenExpiredException(
                     "The login session has expired. Please login again");
         }
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .refresh(jwtRefreshToken)
-                .token(jwtToken)
-                .build();
     }
 }

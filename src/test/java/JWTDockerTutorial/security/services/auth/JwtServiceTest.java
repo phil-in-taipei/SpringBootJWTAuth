@@ -67,7 +67,7 @@ class JwtServiceTest {
                 .isEqualTo(testRefreshTokenExp.length());
     }
 
-
+    /*
     @Test
     void isRefreshTokenValid() {
         String testRefreshToken = jwtService.generateRefreshToken(testUser);
@@ -75,11 +75,13 @@ class JwtServiceTest {
         //assertFalse(jwtService.isRefreshTokenValid(testRefreshTokenExp, testUser));
     }
 
+     */
+
 
     @Test
     void isTokenValid() {
         String testToken = jwtService.generateToken(testUser);
         assertTrue(jwtService.isTokenValid(testToken, testUser));
-        //assertFalse(jwtService.isTokenValid(testTokenExp, testUser));
+        assertFalse(jwtService.isTokenValid(testTokenExp, testUser));
     }
 }

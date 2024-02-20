@@ -4,6 +4,7 @@ import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.*;
 import JWTDockerTutorial.security.services.auth.AuthenticationService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,10 +41,12 @@ public class AuthenticationController {
     @PostMapping("/authenticate")
     public ResponseEntity<Object> register(
             @RequestBody AuthenticationRequest request
-    ) {
+    ) throws UserNotFoundException {
+        System.out.println("Authenticated controller method...");
         try {
             return ResponseEntity.ok(authenticationService.authenticate(request));
         } catch (UserNotFoundException e) {
+            System.out.println("User not found");
             return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(

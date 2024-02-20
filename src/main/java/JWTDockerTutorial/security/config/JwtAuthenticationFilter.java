@@ -29,8 +29,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    //private final UserDetailsService userDetailsService;
+    @Autowired
+    JwtService jwtService;
+
     @Autowired
     UserDetailsServiceImplementation userDetailsService;
 
@@ -72,17 +73,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
             // TODO: double check that these exceptions all throw properly after refactoring (2/19/2024)
-        } catch (SignatureException  | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
             //System.out.println("There has been an error");
             //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"message\": \"Authorization error\" }");
+            response.getOutputStream().print(
+                    "{ \"message\": \"Session Expired. Please login again\" }"
+            );
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        }  catch (ExpiredJwtException e) {
+        } catch (
+                SignatureException  | MalformedJwtException |
+                UnsupportedJwtException | IllegalArgumentException e
+        ) {
             //System.out.println("There has been an error");
             //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getOutputStream().print("{ \"message\": \"Session Expired. Please login again\" }");
+            response.getOutputStream().print(
+                    "{ \"message\": \"Authorization error\" }"
+            );
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         }
     }
