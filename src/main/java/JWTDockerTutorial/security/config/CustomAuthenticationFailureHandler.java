@@ -1,3 +1,4 @@
+/*
 package JWTDockerTutorial.security.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,3 +39,4 @@ public class CustomAuthenticationFailureHandler
                 .println(objectMapper.writeValueAsString(data));
     }
 }
+*/

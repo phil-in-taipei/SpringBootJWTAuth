@@ -1,5 +1,6 @@
 package JWTDockerTutorial.security.services.auth;
 
+import JWTDockerTutorial.security.exceptions.auth.LoginFailureException;
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.logging.BatchLogger;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,14 +32,19 @@ public class AuthenticationService {
     @BatchLogger
     public AuthenticationResponse authenticate(
             AuthenticationRequest request
-    ) throws UserNotFoundException {
+    ) throws UserNotFoundException, AuthenticationException, LoginFailureException {
         System.out.println(".......Running auth manager....");
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername(),
+                            request.getPassword()
+                    )
+            );
+        } catch (AuthenticationException e){
+            throw new LoginFailureException("Login with the provided credentials failed. Please try again");
+        }
+
         System.out.println(".......Getting user....");
         var user = userService.loadUserByUsername(request.getUsername());
         if (user == null) {

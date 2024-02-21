@@ -1,5 +1,6 @@
 package JWTDockerTutorial.security.controllers.auth;
 
+import JWTDockerTutorial.security.exceptions.auth.LoginFailureException;
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.*;
@@ -39,13 +40,13 @@ public class AuthenticationController {
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<Object> register(
+    public ResponseEntity<Object> userLogin(
             @RequestBody AuthenticationRequest request
-    ) throws UserNotFoundException {
+    ) {
         System.out.println("Authenticated controller method...");
         try {
             return ResponseEntity.ok(authenticationService.authenticate(request));
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | LoginFailureException e) {
             System.out.println("User not found");
             return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {

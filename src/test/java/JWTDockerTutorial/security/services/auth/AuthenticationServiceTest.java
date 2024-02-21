@@ -1,6 +1,7 @@
 package JWTDockerTutorial.security.services.auth;
 
 import JWTDockerTutorial.security.SecurityApplication;
+import JWTDockerTutorial.security.exceptions.auth.LoginFailureException;
 import JWTDockerTutorial.security.exceptions.auth.RefreshTokenExpiredException;
 import JWTDockerTutorial.security.exceptions.user.UserNotFoundException;
 import JWTDockerTutorial.security.models.auth.AuthenticationRequest;
@@ -15,18 +16,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.net.PasswordAuthentication;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.IsInstanceOf.any;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes= SecurityApplication.class)
 @ActiveProfiles("test")
-class AuthenticationServiceTest {
+class AuthenticationServiceTest{
 
     @MockBean
     AuthenticationManager authenticationManager;
@@ -71,7 +79,7 @@ class AuthenticationServiceTest {
 
 
     @Test
-    void authenticate() throws UserNotFoundException {
+    void authenticate() throws UserNotFoundException, LoginFailureException {
         when(userService.loadUserByUsername(anyString()))
                 .thenReturn(testUser);
         //when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -90,7 +98,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    void authenticateUserNotFoundFailure() throws UserNotFoundException{
+    void authenticateUserNotFoundFailure() throws UserNotFoundException {
         testAuthRequest.setUsername("incorrect");
         when(userService.loadUserByUsername(anyString()))
                 .thenReturn(null);
@@ -99,7 +107,7 @@ class AuthenticationServiceTest {
         });
     }
 
-    /*
+
     @Test
     void authenticateRefreshToken() throws
             UserNotFoundException, RefreshTokenExpiredException {
@@ -120,6 +128,8 @@ class AuthenticationServiceTest {
         assertThat(testResponse.getRefresh())
                 .isEqualTo(testRefreshToken);
     }
+
+    /*
 
     @Test
     void authenticateRefreshTokenExpiredFailure() {
@@ -149,6 +159,7 @@ class AuthenticationServiceTest {
                     );
         });
     }
-
+    
      */
+
 }
