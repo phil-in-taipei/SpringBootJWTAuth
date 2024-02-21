@@ -36,14 +36,9 @@ public class SecurityConfiguration {
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-                //.exceptionHandling();
-                //.failureHandler(authenticationFailureHandler());
+
 
         return http.build();
     }
 
-    //@Bean
-   // public AuthenticationFailureHandler authenticationFailureHandler() {
-    //    return new CustomAuthenticationFailureHandler();
-    //}
 }

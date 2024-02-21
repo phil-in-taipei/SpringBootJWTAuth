@@ -67,16 +67,6 @@ class JwtServiceTest {
                 .isEqualTo(testRefreshTokenExp.length());
     }
 
-    /*
-    @Test
-    void isRefreshTokenValid() {
-        String testRefreshToken = jwtService.generateRefreshToken(testUser);
-        assertTrue(jwtService.isRefreshTokenValid(testRefreshToken, testUser));
-        //assertFalse(jwtService.isRefreshTokenValid(testRefreshTokenExp, testUser));
-    }
-
-     */
-
 
     @Test
     void isTokenValid() {

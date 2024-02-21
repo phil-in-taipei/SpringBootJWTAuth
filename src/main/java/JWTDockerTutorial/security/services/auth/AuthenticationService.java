@@ -68,6 +68,9 @@ public class AuthenticationService {
         try {
             var username = jwtService.extractUsername(jwtRefreshToken);
             var user = userService.loadUserByUsername(username.substring(0, username.length() / 2));
+            if (user == null) {
+                throw new UserNotFoundException("The user does not exist!");
+            }
             var jwtToken = jwtService.generateToken(user);
             return AuthenticationResponse.builder()
                     .refresh(jwtRefreshToken)

@@ -11,6 +11,7 @@ import JWTDockerTutorial.security.models.user.Role;
 import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
 import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -82,10 +83,6 @@ class AuthenticationServiceTest{
     void authenticate() throws UserNotFoundException, LoginFailureException {
         when(userService.loadUserByUsername(anyString()))
                 .thenReturn(testUser);
-        //when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-        //                anyString(),
-        //                anyString()
-        //        )).isAuthenticated()).thenReturn(true);
         when(jwtService.generateToken(testUser))
                 .thenReturn(testToken);
         when(jwtService.generateRefreshToken(testUser))
@@ -98,7 +95,20 @@ class AuthenticationServiceTest{
     }
 
     @Test
-    void authenticateUserNotFoundFailure() throws UserNotFoundException {
+    void authenticateLoginFailureException() {
+
+        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                        testUser.getUsername(),
+                        testUser.getPassword()
+                ))).thenThrow(new AuthenticationException("exception") {
+        });
+        assertThrows(LoginFailureException.class, () -> {
+            authenticationService.authenticate(testAuthRequest);
+        });
+    }
+
+    @Test
+    void authenticateUserNotFoundFailure() {
         testAuthRequest.setUsername("incorrect");
         when(userService.loadUserByUsername(anyString()))
                 .thenReturn(null);
@@ -111,10 +121,8 @@ class AuthenticationServiceTest{
     @Test
     void authenticateRefreshToken() throws
             UserNotFoundException, RefreshTokenExpiredException {
-        when(userRepository.findByUsername(anyString()))
-                .thenReturn(Optional.ofNullable(testUser));
-       // when(jwtService.isRefreshTokenValid(testRefreshToken, testUser))
-        //        .thenReturn(true);
+        when(userService.loadUserByUsername(anyString()))
+                .thenReturn(testUser);
         when(jwtService.extractUsername(testRefreshToken))
                 .thenReturn(testUser.getUsername() + testUser.getUsername());
         when(jwtService.generateToken(testUser))
@@ -123,22 +131,21 @@ class AuthenticationServiceTest{
                 .authenticateRefreshToken(
                     testRefreshTokenRequest
         );
+        System.out.println(testResponse);
         assertThat(testResponse.getToken())
                 .isEqualTo(testToken2);
         assertThat(testResponse.getRefresh())
                 .isEqualTo(testRefreshToken);
     }
 
-    /*
+
 
     @Test
     void authenticateRefreshTokenExpiredFailure() {
-        when(userRepository.findByUsername(anyString()))
-                .thenReturn(Optional.ofNullable(testUser));
-       // when(jwtService.isRefreshTokenValid(testRefreshToken, testUser))
-       //         .thenReturn(false);
+        when(userService.loadUserByUsername(anyString()))
+                .thenReturn(testUser);
         when(jwtService.extractUsername(testRefreshToken))
-                .thenReturn(testUser.getUsername() + testUser.getUsername());
+                .thenThrow(ExpiredJwtException.class);
         assertThrows(RefreshTokenExpiredException.class, () -> {
             authenticationService
                     .authenticateRefreshToken(
@@ -147,11 +154,13 @@ class AuthenticationServiceTest{
         });
     }
 
+
     @Test
-    void authenticateRefreshTokenUserNotFoundFailure() {
-        testAuthRequest.setUsername("incorrect");
-        when(userRepository.findByUsername(anyString()))
-                .thenReturn(Optional.empty());
+    void authenticateRefreshTokenUserNotFoundFailure()  {
+        when(jwtService.extractUsername(testRefreshToken))
+                .thenReturn(testUser.getUsername() + testUser.getUsername());
+        when(userService.loadUserByUsername(anyString()))
+                .thenReturn(null);
         assertThrows(UserNotFoundException.class, () -> {
             authenticationService
                     .authenticateRefreshToken(
@@ -159,7 +168,5 @@ class AuthenticationServiceTest{
                     );
         });
     }
-    
-     */
 
 }
