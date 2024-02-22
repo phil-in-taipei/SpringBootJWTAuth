@@ -9,10 +9,14 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication
 @Profile("test")
 public class SecurityApplicationTest implements CommandLineRunner {
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
@@ -37,7 +41,7 @@ public class SecurityApplicationTest implements CommandLineRunner {
                     .surname("User")
                     .username("TestUser")
                     .email("test@gmx.com")
-                    .password("testpassword")
+                    .password(passwordEncoder.encode("testpassword"))
                     .role(Role.USER)
                     .build();
             userRepository.save(testUser);
@@ -46,7 +50,7 @@ public class SecurityApplicationTest implements CommandLineRunner {
                     .surname("Admin")
                     .username("TestAdmin")
                     .email("test@gmx.com")
-                    .password("testpassword")
+                    .password(passwordEncoder.encode("testpassword"))
                     .role(Role.ADMIN)
                     .build();
             userRepository.save(testAdmin);
