@@ -131,7 +131,6 @@ class AuthenticationServiceTest{
                 .authenticateRefreshToken(
                     testRefreshTokenRequest
         );
-        System.out.println(testResponse);
         assertThat(testResponse.getToken())
                 .isEqualTo(testToken2);
         assertThat(testResponse.getRefresh())

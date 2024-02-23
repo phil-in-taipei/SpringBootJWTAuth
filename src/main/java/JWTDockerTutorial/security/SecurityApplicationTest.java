@@ -35,7 +35,7 @@ public class SecurityApplicationTest implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("*****************Running Tests**********************");
         if (userRepository.findAll().isEmpty()) {
-            System.out.println("The user repo is empty");
+            //System.out.println("The user repo is empty");
             User testUser = User.builder()
                     .givenName("Test")
                     .surname("User")

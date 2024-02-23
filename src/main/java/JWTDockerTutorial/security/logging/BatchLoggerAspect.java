@@ -20,7 +20,7 @@ public class BatchLoggerAspect {
 
     @Before("executeLogging()")
     public void logMethodCall(JoinPoint joinPoint) {
-        StringBuilder message = new StringBuilder("Batch method Name : ");
+        StringBuilder message = new StringBuilder(" Batch method Name : ");
         message.append(message.append(joinPoint.getSignature().getName()));
         final Object[] args = joinPoint.getArgs();
         if (args != null && args.length > 0) {

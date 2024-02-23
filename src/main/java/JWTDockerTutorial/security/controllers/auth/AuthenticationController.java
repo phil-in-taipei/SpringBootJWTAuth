@@ -43,7 +43,6 @@ public class AuthenticationController {
     public ResponseEntity<Object> userLogin(
             @RequestBody AuthenticationRequest request
     ) {
-        System.out.println("Authenticated controller method...");
         try {
             return ResponseEntity.ok(authenticationService.authenticate(request));
         } catch (UserNotFoundException | LoginFailureException e) {

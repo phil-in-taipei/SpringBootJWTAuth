@@ -19,13 +19,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +35,8 @@ public class AuthenticationControllerEndpointTests {
     MockMvc mockMvc;
 
     private static final ThreadLocal<String> refreshHolder = new ThreadLocal<>();
+
+    private static final ThreadLocal<String> tokenHolder = new ThreadLocal<>();
 
     @Test
     @Order(1)
@@ -62,10 +60,31 @@ public class AuthenticationControllerEndpointTests {
         String responseBody = result.getResponse().getContentAsString();
         Map responseMap = mapper.readValue(responseBody, Map.class);
         refreshHolder.set((String) responseMap.get("refresh"));
+        tokenHolder.set((String) responseMap.get("token"));
+    }
+
+    // note: this controller is in another class "demo:AuthDemoController"
+    @Test
+    @Order(2)
+    public void testConfirmAuthenticated() throws Exception {
+        String tokenString = "Bearer " + tokenHolder.get();
+        mockMvc.perform(get("/api/auth-required")
+                        .contentType("application/json")
+                        .header("Authorization", tokenString)
+                )
+                //.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(
+                        jsonPath("message")
+                                .value(
+                                        "Response from authenticated endpoint successful"
+                                )
+                );
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     public void testRefreshNewToken() throws Exception {
         String refresh = refreshHolder.get();
         TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(

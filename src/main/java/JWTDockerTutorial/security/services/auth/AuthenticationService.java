@@ -33,7 +33,6 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(
             AuthenticationRequest request
     ) throws UserNotFoundException, AuthenticationException, LoginFailureException {
-        System.out.println(".......Running auth manager....");
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -42,10 +41,10 @@ public class AuthenticationService {
                     )
             );
         } catch (AuthenticationException e){
-            throw new LoginFailureException("Login with the provided credentials failed. Please try again");
+            throw new LoginFailureException(
+                    "Login with the provided credentials failed. Please try again"
+            );
         }
-
-        System.out.println(".......Getting user....");
         var user = userService.loadUserByUsername(request.getUsername());
         if (user == null) {
             throw new UserNotFoundException("The user does not exist!");
@@ -62,9 +61,7 @@ public class AuthenticationService {
     public AuthenticationResponse authenticateRefreshToken(
             TokenRefreshRequest request
     ) throws UserNotFoundException, RefreshTokenExpiredException, ExpiredJwtException {
-        System.out.println(request);
         var jwtRefreshToken = request.getRefresh();
-        System.out.println("This is the jwtToken in the auth refresh token class : " + jwtRefreshToken);
         try {
             var username = jwtService.extractUsername(jwtRefreshToken);
             var user = userService.loadUserByUsername(username.substring(0, username.length() / 2));
