@@ -20,6 +20,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.net.PasswordAuthentication;
@@ -111,8 +112,8 @@ class AuthenticationServiceTest{
     void authenticateUserNotFoundFailure() {
         testAuthRequest.setUsername("incorrect");
         when(userService.loadUserByUsername(anyString()))
-                .thenReturn(null);
-        assertThrows(UserNotFoundException.class, () -> {
+                .thenThrow(new UsernameNotFoundException("User not found"));
+        assertThrows(LoginFailureException.class, () -> {
             authenticationService.authenticate(testAuthRequest);
         });
     }
@@ -159,7 +160,7 @@ class AuthenticationServiceTest{
         when(jwtService.extractUsername(testRefreshToken))
                 .thenReturn(testUser.getUsername() + testUser.getUsername());
         when(userService.loadUserByUsername(anyString()))
-                .thenReturn(null);
+                .thenThrow(new UsernameNotFoundException("User not found"));
         assertThrows(UserNotFoundException.class, () -> {
             authenticationService
                     .authenticateRefreshToken(

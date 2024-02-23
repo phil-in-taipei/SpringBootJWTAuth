@@ -41,21 +41,21 @@ public class AuthenticationService {
                             request.getPassword()
                     )
             );
+
+            var user = userService.loadUserByUsername(request.getUsername());
+            var jwtToken = jwtService.generateToken(user);
+            var jwtRefreshToken = jwtService.generateRefreshToken(user);
+            return AuthenticationResponse.builder()
+                    .refresh(jwtRefreshToken)
+                    .token(jwtToken)
+                    .build();
+
         } catch (AuthenticationException e){
             throw new LoginFailureException(
                     "Login with the provided credentials failed. Please try again"
             );
         }
-        var user = userService.loadUserByUsername(request.getUsername());
-        if (user == null) {
-            throw new UserNotFoundException("The user does not exist!");
-        }
-        var jwtToken = jwtService.generateToken(user);
-        var jwtRefreshToken = jwtService.generateRefreshToken(user);
-        return AuthenticationResponse.builder()
-                .refresh(jwtRefreshToken)
-                .token(jwtToken)
-                .build();
+
     }
 
     @BatchLogger

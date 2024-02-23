@@ -14,7 +14,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
@@ -83,6 +82,7 @@ public class AuthenticationControllerEndpointTests {
                 );
     }
 
+    // note: this controller is in another class "demo:AuthDemoController"
     @Test
     @Order(3)
     public void testConfirmExpiredFailure() throws Exception {
@@ -103,6 +103,7 @@ public class AuthenticationControllerEndpointTests {
                 );
     }
 
+    // note: this controller is in another class "demo:AuthDemoController"
     /*
     @Test
     @Order(4)
@@ -125,7 +126,7 @@ public class AuthenticationControllerEndpointTests {
                                 )
                 );
     }
-    
+
      */
 
 
@@ -169,9 +170,12 @@ public class AuthenticationControllerEndpointTests {
                 );
     }
 
+    /*
     @Test
     @Order(7)
     public void testRefreshNewTokenNonExistentUserError() throws Exception {
+        // Note: the token used below must be generated in the past 24 hours with
+        // a user that is no longer in the database
         String getTestNonExistentUserRefreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjZUZXN0VXNlcjYiLCJpYXQiOjE3MDg2NzQzMTQsImV4cCI6MTcwODc2MDcxNH0.inaR5fd3XQfKWkCIrVRaLbl0piAvm5pebFMJCuy5mHE";
         TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
                 getTestNonExistentUserRefreshToken
@@ -189,5 +193,7 @@ public class AuthenticationControllerEndpointTests {
                         )
                 );
     }
+    
+     */
 
 }
