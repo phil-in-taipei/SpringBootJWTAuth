@@ -9,6 +9,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +47,6 @@ public class AuthenticationController {
         try {
             return ResponseEntity.ok(authenticationService.authenticate(request));
         } catch (UserNotFoundException | LoginFailureException e) {
-            System.out.println("User not found");
             return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(

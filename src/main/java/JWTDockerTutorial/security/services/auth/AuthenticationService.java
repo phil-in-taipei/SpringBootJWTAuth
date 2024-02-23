@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -65,9 +66,6 @@ public class AuthenticationService {
         try {
             var username = jwtService.extractUsername(jwtRefreshToken);
             var user = userService.loadUserByUsername(username.substring(0, username.length() / 2));
-            if (user == null) {
-                throw new UserNotFoundException("The user does not exist!");
-            }
             var jwtToken = jwtService.generateToken(user);
             return AuthenticationResponse.builder()
                     .refresh(jwtRefreshToken)
@@ -76,6 +74,8 @@ public class AuthenticationService {
         } catch (ExpiredJwtException e) {
             throw new RefreshTokenExpiredException(
                     "The login session has expired. Please login again");
-        }
+        } catch (UsernameNotFoundException e) {
+        throw new UserNotFoundException("The user does not exist!");
+    }
     }
 }

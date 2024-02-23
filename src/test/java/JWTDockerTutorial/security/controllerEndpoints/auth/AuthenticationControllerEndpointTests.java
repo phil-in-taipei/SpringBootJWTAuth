@@ -85,6 +85,53 @@ public class AuthenticationControllerEndpointTests {
 
     @Test
     @Order(3)
+    public void testConfirmExpiredFailure() throws Exception {
+        String testTokenExp = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlciIsImlhdCI6MTcwODMzOTkyNSwiZXhwIjoxNzA4MzQwNTI1fQ.KatZsTHYGSrT5_dUX-d1aJ0LG5C1WeTIBQ71-CgisUo";
+        String tokenString = "Bearer " + testTokenExp;
+        mockMvc.perform(get("/api/auth-required")
+                        .contentType("application/json")
+                        .header("Authorization", tokenString)
+                )
+                //.andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(
+                        jsonPath("message")
+                                .value(
+                                        "Session Expired. Please login again"
+                                )
+                );
+    }
+
+    /*
+    @Test
+    @Order(4)
+    public void testConfirmNonExistentUserFailure() throws Exception {
+        // Note: the token used below must be generated in the past 10 minutes with
+        // a user that is no longer in the database
+        String testNonExistentUserToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjYiLCJpYXQiOjE3MDg2NzQzMTQsImV4cCI6MTcwODY3NDkxNH0.m2dzdwzhTONVDolwLBhXTSB05tz6NaAshWiCloDoozo";
+        String tokenString = "Bearer " + testNonExistentUserToken;
+        mockMvc.perform(get("/api/auth-required")
+                        .contentType("application/json")
+                        .header("Authorization", tokenString)
+                )
+                //.andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(
+                        jsonPath("message")
+                                .value(
+                                        "Authorization error"
+                                )
+                );
+    }
+    
+     */
+
+
+
+    @Test
+    @Order(5)
     public void testRefreshNewToken() throws Exception {
         String refresh = refreshHolder.get();
         TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
@@ -99,6 +146,48 @@ public class AuthenticationControllerEndpointTests {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("refresh").value(refresh))
                 .andExpect(jsonPath("token").isNotEmpty());
+    }
+
+    @Test
+    @Order(6)
+    public void testRefreshNewTokenExpiredError() throws Exception {
+        String testRefreshTokenExp = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlclRlc3RVc2VyIiwiaWF0IjoxNzA4MzM5OTI1LCJleHAiOjE3MDg0MjYzMjV9.SoSyPS5PODhjAOzyVYZ4pMFIIQ0eHPObCUk96-TkMMw";
+        TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
+                testRefreshTokenExp
+        );
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(testRefreshTokenRequest))
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("message")
+                        .value(
+                                "The login session has expired. Please login again"
+                        )
+                );
+    }
+
+    @Test
+    @Order(7)
+    public void testRefreshNewTokenNonExistentUserError() throws Exception {
+        String getTestNonExistentUserRefreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjZUZXN0VXNlcjYiLCJpYXQiOjE3MDg2NzQzMTQsImV4cCI6MTcwODc2MDcxNH0.inaR5fd3XQfKWkCIrVRaLbl0piAvm5pebFMJCuy5mHE";
+        TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
+                getTestNonExistentUserRefreshToken
+        );
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(testRefreshTokenRequest))
+                )
+                //.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("message")
+                        .value(
+                                "The user does not exist!"
+                        )
+                );
     }
 
 }
