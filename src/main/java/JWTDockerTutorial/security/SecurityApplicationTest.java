@@ -34,10 +34,13 @@ public class SecurityApplicationTest implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        System.out.println("*****************Running Tests**********************");
+        System.out.println("----------------Preparing Database for Tests---------------");
+        // note: these mock users differ from the ones below (spaces in username)
+        // The mock users deleted here are created in the UserRegistrationControllerEndpointTest class
         userRepository.deleteByUsername("Test User");
+        userRepository.deleteByUsername("Test Admin");
         if (userRepository.findAll().isEmpty()) {
-            //System.out.println("The user repo is empty");
+            System.out.println("The user repo is empty. Creating mock users");
             User testUser = User.builder()
                     .givenName("Test")
                     .surname("User")
@@ -57,5 +60,6 @@ public class SecurityApplicationTest implements CommandLineRunner {
                     .build();
             userRepository.save(testAdmin);
         }
+        System.out.println("*****************Running Tests**********************");
     }
 }
