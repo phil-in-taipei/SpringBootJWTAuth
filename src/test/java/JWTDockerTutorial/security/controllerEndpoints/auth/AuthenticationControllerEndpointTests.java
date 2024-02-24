@@ -1,5 +1,6 @@
 package JWTDockerTutorial.security.controllerEndpoints.auth;
 
+import JWTDockerTutorial.security.exceptions.auth.LoginFailureException;
 import JWTDockerTutorial.security.models.auth.TokenRefreshRequest;
 import JWTDockerTutorial.security.utils.TestUtil;
 import JWTDockerTutorial.security.SecurityApplication;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,8 +45,6 @@ public class AuthenticationControllerEndpointTests {
         AuthenticationRequest testAuthRequest = new AuthenticationRequest(
                 "TestUser", "testpassword"
         );
-
-
         MvcResult result = mockMvc.perform(post("/api/auth/authenticate")
                                 .contentType("application/json")
                                 .content(TestUtil.convertObjectToJsonBytes(testAuthRequest))
@@ -60,6 +60,26 @@ public class AuthenticationControllerEndpointTests {
         Map responseMap = mapper.readValue(responseBody, Map.class);
         refreshHolder.set((String) responseMap.get("refresh"));
         tokenHolder.set((String) responseMap.get("token"));
+    }
+
+    @Test
+    @Order(8)
+    void userLoginCredentialsFailure() throws Exception {
+        AuthenticationRequest testAuthRequest = new AuthenticationRequest(
+                "TestUser", "wrongpassword"
+        );
+        mockMvc.perform(post("/api/auth/authenticate")
+                        .contentType("application/json")
+                        .content(TestUtil.convertObjectToJsonBytes(testAuthRequest))
+                )
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("message")
+                        .value(
+                                "Login with the provided credentials failed. Please try again"
+                        )
+                );
     }
 
     // note: this controller is in another class "demo:AuthDemoController"

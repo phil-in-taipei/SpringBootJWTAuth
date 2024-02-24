@@ -126,7 +126,7 @@ class UserRegistrationControllerTest {
                         .contentType("application/json")
                         .content(TestUtil.convertObjectToJsonBytes(testUserRegistrationRequest))
                 )
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(content().contentType("application/json"))

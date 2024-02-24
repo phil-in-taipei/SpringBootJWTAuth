@@ -53,7 +53,6 @@ class AuthenticationServiceTest{
     @MockBean
     UserDetailsServiceImplementation userService;
 
-
     User testUser = User.builder()
             .givenName("Test")
             .surname("User")

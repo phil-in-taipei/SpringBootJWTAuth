@@ -3,7 +3,7 @@ package JWTDockerTutorial.security;
 import JWTDockerTutorial.security.models.user.Role;
 import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
-import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
+//import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
