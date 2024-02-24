@@ -10,6 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootApplication
 @Profile("test")
@@ -31,9 +32,10 @@ public class SecurityApplicationTest implements CommandLineRunner {
 
 
     @Override
-    //@Transactional
+    @Transactional
     public void run(String... args) throws Exception {
         System.out.println("*****************Running Tests**********************");
+        userRepository.deleteByUsername("Test User");
         if (userRepository.findAll().isEmpty()) {
             //System.out.println("The user repo is empty");
             User testUser = User.builder()
