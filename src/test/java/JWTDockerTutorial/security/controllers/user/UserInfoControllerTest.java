@@ -29,15 +29,12 @@ import org.springframework.security.core.Authentication;
 
 @WebMvcTest(UserInfoController.class)
 @ContextConfiguration(classes = {SecurityApplication.class})
-@AutoConfigureMockMvc(addFilters = false)
+//@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class UserInfoControllerTest {
 
     @Autowired
     MockMvc mockMvc;
-
-    @MockBean
-    Authentication authentication;
 
     @MockBean
     AuthenticationService authenticationService;
@@ -62,10 +59,8 @@ class UserInfoControllerTest {
 
 
     @Test
-    @WithMockUser(authorities = {"USER",}, username = "TestUser")
-    //@WithUserDetails("TestUser")
+    @WithMockUser(authorities = "USER", username = "TestUser")
     void authenticatedUserInfo() throws Exception {
-        when(authentication.getPrincipal()).thenReturn(testUser);
         when(userDetailsService.loadUserByUsername("TestUser"))
                 .thenReturn(testUser);
         mockMvc.perform(get("/api/user/authenticated")
