@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
-public class AuthDemoControllerEndpointTest {
+public class UserInfoControllerEndpointTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -28,16 +28,36 @@ public class AuthDemoControllerEndpointTest {
     @Test
     @Order(1)
     @WithUserDetails("TestUser")
-    void confirmAuthenticated() throws Exception {
-        mockMvc.perform(get("/api/auth-required")
+    void authenticatedUserInfo() throws Exception {
+        mockMvc.perform(get("/api/user/authenticated")
                         .contentType("application/json")
                 )
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("message")
+                .andExpect(jsonPath("givenName")
                         .value(
-                                "Response from authenticated endpoint successful"
+                                "Test"
+                        )
+                )
+                .andExpect(jsonPath("surname")
+                        .value(
+                                "User"
+                        )
+                )
+                .andExpect(jsonPath("email")
+                        .value(
+                                "test@gmx.com"
+                        )
+                )
+                .andExpect(jsonPath("role")
+                        .value(
+                                "USER"
+                        )
+                )
+                .andExpect(jsonPath("username")
+                        .value(
+                                "TestUser"
                         )
                 );
     }
