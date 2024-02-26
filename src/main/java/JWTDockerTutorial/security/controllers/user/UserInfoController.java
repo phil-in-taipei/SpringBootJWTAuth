@@ -27,6 +27,16 @@ public class UserInfoController {
     @Autowired
     UserDetailsServiceImplementation userService;
 
+    @GetMapping("/test")
+    public ResponseEntity<String> authenticatedAdminTestRoute() {
+        final HttpHeaders httpHeaders= new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<String>(
+                "{\"message\": \"Response from authenticated endpoint successful\"}",
+                httpHeaders, HttpStatus.OK
+        );
+    }
+
     @GetMapping("/authenticated")
     public ResponseEntity<Object> authenticatedUserInfo(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();

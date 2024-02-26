@@ -21,7 +21,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,9 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AdminController.class)
 @ContextConfiguration(classes = {SecurityApplication.class})
-//@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = true)
 @ActiveProfiles("test")
 class AdminControllerTest {
+
+    @Autowired
+    private WebApplicationContext context;
 
     @Autowired
     MockMvc mockMvc;
@@ -59,6 +66,15 @@ class AdminControllerTest {
             .role(Role.USER)
             .build();
 
+    User testUser2 = User.builder()
+            .givenName("Test")
+            .surname("User2")
+            .username("TestUser2")
+            .email("test@gmx.com")
+            .password("testpassword")
+            .role(Role.USER)
+            .build();
+
     User testAdmin = User.builder()
             .givenName("Test")
             .surname("Admin")
@@ -69,14 +85,14 @@ class AdminControllerTest {
             .build();
 
     @Test
-    @WithMockUser(authorities = {"ADMIN",}, username = "TestAdmin")
+    @WithMockUser(authorities = {"ROLE_ADMIN",}, username = "TestAdmin")
     void authenticatedAdminInfo() throws Exception {
         when(userDetailsService.loadUserByUsername("TestAdmin"))
                 .thenReturn(testAdmin);
         mockMvc.perform(get("/api/admin/authenticated")
                         .contentType("application/json")
                 )
-                .andDo(print())
+                //.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("givenName")
@@ -106,28 +122,67 @@ class AdminControllerTest {
                 );
     }
 
-/* // the test below does not detect incorrect authorities
     @Test
-    @WithMockUser(authorities = {"USER", }, username = "TestUser")
-    void authenticatedAdminPermissionsError() throws Exception {
-        mockMvc.perform(get("/api/admin/authenticated")
+    @WithMockUser(authorities = {"ROLE_ADMIN",}, username = "TestAdmin")
+    void getStandardUsers() throws Exception {
+        when(userDetailsService.getAllStandardUsers())
+                .thenReturn(List.of(testUser, testUser2));
+        mockMvc.perform(get("/api/admin/standard-users")
                         .contentType("application/json")
                 )
-                .andDo(print())
-                .andExpect(status().isForbidden())
+                //.andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("message")
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0]givenName")
                         .value(
-                                "Authorization permissions error"
+                                "Test"
+                        )
+                )
+                .andExpect(jsonPath("$[0]surname")
+                        .value(
+                                "User"
+                        )
+                )
+                .andExpect(jsonPath("$[0]email")
+                        .value(
+                                "test@gmx.com"
+                        )
+                )
+                .andExpect(jsonPath("$[0]role")
+                        .value(
+                                "USER"
+                        )
+                )
+                .andExpect(jsonPath("$[0]username")
+                        .value(
+                                "TestUser"
+                        )
+                )
+                .andExpect(jsonPath("$[1]givenName")
+                        .value(
+                                "Test"
+                        )
+                )
+                .andExpect(jsonPath("$[1]surname")
+                        .value(
+                                "User2"
+                        )
+                )
+                .andExpect(jsonPath("$[1]email")
+                        .value(
+                                "test@gmx.com"
+                        )
+                )
+                .andExpect(jsonPath("$[1]role")
+                        .value(
+                                "USER"
+                        )
+                )
+                .andExpect(jsonPath("$[1]username")
+                        .value(
+                                "TestUser2"
                         )
                 );
-    }
-
- */
-
-    @Test
-    @WithMockUser(authorities = {"ADMIN",}, username = "TestAdmin")
-    void getStandardUsers() throws Exception {
-
     }
 }

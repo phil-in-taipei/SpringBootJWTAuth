@@ -1,6 +1,5 @@
 package JWTDockerTutorial.security.controllerEndpoints.auth;
 
-import JWTDockerTutorial.security.exceptions.auth.LoginFailureException;
 import JWTDockerTutorial.security.models.auth.TokenRefreshRequest;
 import JWTDockerTutorial.security.utils.TestUtil;
 import JWTDockerTutorial.security.SecurityApplication;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.Map;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @AutoConfigureMockMvc
-public class AuthenticationControllerEndpointTests {
+public class AuthenticationControllerAndTokensEndpointTests {
 
     @Autowired
     MockMvc mockMvc;
@@ -63,7 +61,7 @@ public class AuthenticationControllerEndpointTests {
     }
 
     @Test
-    @Order(8)
+    @Order(9)
     void userLoginCredentialsFailure() throws Exception {
         AuthenticationRequest testAuthRequest = new AuthenticationRequest(
                 "TestUser", "wrongpassword"
@@ -72,7 +70,7 @@ public class AuthenticationControllerEndpointTests {
                         .contentType("application/json")
                         .content(TestUtil.convertObjectToJsonBytes(testAuthRequest))
                 )
-                .andDo(print())
+                //.andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("message")
@@ -82,12 +80,12 @@ public class AuthenticationControllerEndpointTests {
                 );
     }
 
-    // note: this controller is in another class "demo:AuthDemoController"
+    // note: this controller is in another class "user:UserInfoController"
     @Test
     @Order(2)
     public void testConfirmAuthenticated() throws Exception {
         String tokenString = "Bearer " + tokenHolder.get();
-        mockMvc.perform(get("/api/auth-required")
+        mockMvc.perform(get("/api/user/test")
                         .contentType("application/json")
                         .header("Authorization", tokenString)
                 )
@@ -102,13 +100,33 @@ public class AuthenticationControllerEndpointTests {
                 );
     }
 
-    // note: this controller is in another class "demo:AuthDemoController"
+    // note: this controller is in another class "admin:AdminController"
     @Test
     @Order(3)
+    public void testConfirmAuthoritiesPermissionFailure() throws Exception {
+        String tokenString = "Bearer " + tokenHolder.get();
+        mockMvc.perform(get("/api/admin/test")
+                        .contentType("application/json")
+                        .header("Authorization", tokenString)
+                )
+                //.andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(
+                        jsonPath("message")
+                                .value(
+                                        "Authorization permissions error"
+                                )
+                );
+    }
+
+    // note: this controller is in another class "user:UserInfoController"
+    @Test
+    @Order(4)
     public void testConfirmExpiredFailure() throws Exception {
         String testTokenExp = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlciIsImlhdCI6MTcwODMzOTkyNSwiZXhwIjoxNzA4MzQwNTI1fQ.KatZsTHYGSrT5_dUX-d1aJ0LG5C1WeTIBQ71-CgisUo";
         String tokenString = "Bearer " + testTokenExp;
-        mockMvc.perform(get("/api/auth-required")
+        mockMvc.perform(get("/api/user/test")
                         .contentType("application/json")
                         .header("Authorization", tokenString)
                 )
@@ -126,13 +144,13 @@ public class AuthenticationControllerEndpointTests {
     // note: this controller is in another class "demo:AuthDemoController"
     /*
     @Test
-    @Order(4)
+    @Order(5)
     public void testConfirmNonExistentUserFailure() throws Exception {
         // Note: the token used below must be generated in the past 10 minutes with
         // a user that is no longer in the database
         String testNonExistentUserToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlcjYiLCJpYXQiOjE3MDg2NzQzMTQsImV4cCI6MTcwODY3NDkxNH0.m2dzdwzhTONVDolwLBhXTSB05tz6NaAshWiCloDoozo";
         String tokenString = "Bearer " + testNonExistentUserToken;
-        mockMvc.perform(get("/api/auth-required")
+        mockMvc.perform(get("/api/user/test")
                         .contentType("application/json")
                         .header("Authorization", tokenString)
                 )
@@ -150,9 +168,8 @@ public class AuthenticationControllerEndpointTests {
      */
 
 
-
     @Test
-    @Order(5)
+    @Order(6)
     public void testRefreshNewToken() throws Exception {
         String refresh = refreshHolder.get();
         TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
@@ -170,7 +187,7 @@ public class AuthenticationControllerEndpointTests {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testRefreshNewTokenExpiredError() throws Exception {
         String testRefreshTokenExp = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJUZXN0VXNlclRlc3RVc2VyIiwiaWF0IjoxNzA4MzM5OTI1LCJleHAiOjE3MDg0MjYzMjV9.SoSyPS5PODhjAOzyVYZ4pMFIIQ0eHPObCUk96-TkMMw";
         TokenRefreshRequest testRefreshTokenRequest = new TokenRefreshRequest(
@@ -192,7 +209,7 @@ public class AuthenticationControllerEndpointTests {
 
     /*
     @Test
-    @Order(7)
+    @Order(8)
     public void testRefreshNewTokenNonExistentUserError() throws Exception {
         // Note: the token used below must be generated in the past 24 hours with
         // a user that is no longer in the database

@@ -50,6 +50,15 @@ public class SecurityApplicationTest implements CommandLineRunner {
                     .role(Role.USER)
                     .build();
             userRepository.save(testUser);
+            User testUser2 = User.builder()
+                    .givenName("Test")
+                    .surname("User2")
+                    .username("TestUser2")
+                    .email("test@gmx.com")
+                    .password("testpassword")
+                    .role(Role.USER)
+                    .build();
+            userRepository.save(testUser2);
             User testAdmin = User.builder()
                     .givenName("Test")
                     .surname("Admin")
