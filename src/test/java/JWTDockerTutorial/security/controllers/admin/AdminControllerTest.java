@@ -1,4 +1,4 @@
-package JWTDockerTutorial.security.controllers.user;
+package JWTDockerTutorial.security.controllers.admin;
 
 import JWTDockerTutorial.security.SecurityApplication;
 import JWTDockerTutorial.security.models.user.Role;
@@ -13,23 +13,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(UserInfoController.class)
+@WebMvcTest(AdminController.class)
 @ContextConfiguration(classes = {SecurityApplication.class})
 @AutoConfigureMockMvc(addFilters = true)
 @ActiveProfiles("test")
-class UserInfoControllerTest {
+class AdminControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -55,13 +54,21 @@ class UserInfoControllerTest {
             .role(Role.USER)
             .build();
 
+    User testAdmin = User.builder()
+            .givenName("Test")
+            .surname("Admin")
+            .username("TestAdmin")
+            .email("test@gmx.com")
+            .password("testpassword")
+            .role(Role.ADMIN)
+            .build();
 
     @Test
-    @WithMockUser(authorities = {"USER", }, username = "TestUser")
-    void authenticatedUserInfo() throws Exception {
-        when(userDetailsService.loadUserByUsername("TestUser"))
-                .thenReturn(testUser);
-        mockMvc.perform(get("/api/user/authenticated")
+    @WithMockUser(authorities = {"ADMIN",}, username = "TestAdmin")
+    void authenticatedAdminInfo() throws Exception {
+        when(userDetailsService.loadUserByUsername("TestAdmin"))
+                .thenReturn(testAdmin);
+        mockMvc.perform(get("/api/admin/authenticated")
                         .contentType("application/json")
                 )
                 //.andDo(print())
@@ -74,7 +81,7 @@ class UserInfoControllerTest {
                 )
                 .andExpect(jsonPath("surname")
                         .value(
-                                "User"
+                                "Admin"
                         )
                 )
                 .andExpect(jsonPath("email")
@@ -84,13 +91,35 @@ class UserInfoControllerTest {
                 )
                 .andExpect(jsonPath("role")
                         .value(
-                                "USER"
+                                "ADMIN"
                         )
                 )
                 .andExpect(jsonPath("username")
                         .value(
-                                "TestUser"
+                                "TestAdmin"
                         )
                 );
+    }
+
+    @Test
+    @WithMockUser(authorities = {"USER",}, username = "TestUser")
+    void authenticatedAdminPermissionsError() throws Exception {
+        when(userDetailsService.loadUserByUsername("TestUser"))
+                .thenReturn(testUser);
+        mockMvc.perform(get("/api/admin/authenticated")
+                        .contentType("application/json")
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("message")
+                        .value(
+                                "Authorization permissions error"
+                        )
+                );
+    }
+
+    @Test
+    void getStandardUsers() {
     }
 }

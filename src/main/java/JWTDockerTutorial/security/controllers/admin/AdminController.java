@@ -22,9 +22,9 @@ public class AdminController {
 
     @Autowired
     UserDetailsServiceImplementation userService;
-    /*
+
     @GetMapping("/test")
-    public ResponseEntity<String> authenticatedAdmin() {
+    public ResponseEntity<String> authenticatedAdminTestRoute() {
         final HttpHeaders httpHeaders= new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<String>(
@@ -32,8 +32,6 @@ public class AdminController {
                 httpHeaders, HttpStatus.OK
         );
     }
-
-     */
 
     @GetMapping("/authenticated")
     public ResponseEntity<Object> authenticatedAdminInfo(Authentication authentication) {
