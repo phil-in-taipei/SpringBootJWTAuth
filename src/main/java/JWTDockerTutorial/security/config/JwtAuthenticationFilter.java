@@ -14,12 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.http.HttpStatus;
 
@@ -74,8 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             // TODO: double check that these exceptions all throw properly after refactoring (2/19/2024)
         } catch (ExpiredJwtException e) {
-            //System.out.println("There has been an error");
-            //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getOutputStream().print(
                     "{ \"message\": \"Session Expired. Please login again\" }"
@@ -85,8 +85,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SignatureException | MalformedJwtException | UsernameNotFoundException |
                 UnsupportedJwtException | IllegalArgumentException e
         ) {
-            //System.out.println("There has been an error");
-            //System.out.println(e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getOutputStream().print(
                     "{ \"message\": \"Authorization error\" }"
