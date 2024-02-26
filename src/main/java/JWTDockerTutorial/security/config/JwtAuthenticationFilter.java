@@ -47,19 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String jwtToken;
         final String username;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            //System.out.println("It is null or has different header");
             filterChain.doFilter(request, response);
             return;
         }
         try {
             jwtToken = authHeader.substring(7); // after the "Bearer " prefix
-            //System.out.println("This is the jwtToken in the auth filter class : " + jwtToken);
             username = jwtService.extractUsername(jwtToken);
-            //System.out.println("This is the username in the auth filter class: " + username);
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                //System.out.println("The user is not logged in (auth filter class if clause)");
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-                //System.out.println("These are the user details (in the auth filter): " + userDetails);
                 if (jwtService.isTokenValid(jwtToken, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
@@ -69,12 +64,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource().buildDetails(request)
                     );
-                    //System.out.println("This is the token that has been generated (auth filter): " + authToken);
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
             filterChain.doFilter(request, response);
-            // TODO: double check that these exceptions all throw properly after refactoring (2/19/2024)
         } catch (ExpiredJwtException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getOutputStream().print(

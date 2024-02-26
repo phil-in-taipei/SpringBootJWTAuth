@@ -35,11 +35,5 @@ public class UserInfoController {
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.badRequest().body(new ApiError(e.getMessage()));
         }
-        //final HttpHeaders httpHeaders= new HttpHeaders();
-        //httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        //return new ResponseEntity<String>(
-        //        "{\"message\": \"Response from authenticated endpoint successful\"}",
-        //        httpHeaders, HttpStatus.OK
-        //);
     }
 }
