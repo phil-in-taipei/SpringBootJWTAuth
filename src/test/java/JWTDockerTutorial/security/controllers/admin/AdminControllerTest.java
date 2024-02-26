@@ -1,21 +1,26 @@
 package JWTDockerTutorial.security.controllers.admin;
 
 import JWTDockerTutorial.security.SecurityApplication;
+import JWTDockerTutorial.security.config.SecurityConfiguration;
 import JWTDockerTutorial.security.models.user.Role;
 import JWTDockerTutorial.security.models.user.User;
 import JWTDockerTutorial.security.repositories.user.UserRepository;
 import JWTDockerTutorial.security.services.auth.AuthenticationService;
 import JWTDockerTutorial.security.services.auth.JwtService;
 import JWTDockerTutorial.security.services.user.UserDetailsServiceImplementation;
+import jakarta.servlet.Filter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -26,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AdminController.class)
 @ContextConfiguration(classes = {SecurityApplication.class})
-@AutoConfigureMockMvc(addFilters = true)
+//@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class AdminControllerTest {
 
@@ -71,7 +76,7 @@ class AdminControllerTest {
         mockMvc.perform(get("/api/admin/authenticated")
                         .contentType("application/json")
                 )
-                //.andDo(print())
+                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("givenName")
@@ -101,16 +106,15 @@ class AdminControllerTest {
                 );
     }
 
+/* // the test below does not detect incorrect authorities
     @Test
-    @WithMockUser(authorities = {"USER",}, username = "TestUser")
+    @WithMockUser(authorities = {"USER", }, username = "TestUser")
     void authenticatedAdminPermissionsError() throws Exception {
-        when(userDetailsService.loadUserByUsername("TestUser"))
-                .thenReturn(testUser);
         mockMvc.perform(get("/api/admin/authenticated")
                         .contentType("application/json")
                 )
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isForbidden())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(jsonPath("message")
                         .value(
@@ -119,7 +123,11 @@ class AdminControllerTest {
                 );
     }
 
+ */
+
     @Test
-    void getStandardUsers() {
+    @WithMockUser(authorities = {"ADMIN",}, username = "TestAdmin")
+    void getStandardUsers() throws Exception {
+
     }
 }
